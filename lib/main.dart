@@ -6,6 +6,8 @@ void main() {
   runApp(const MyApp());
 }
 
+int currentPage = 0;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,6 +32,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
+      // ignore: prefer_const_constructors
       body: MainPage(),
     );
   }

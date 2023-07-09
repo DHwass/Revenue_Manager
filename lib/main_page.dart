@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'main.dart';
+import 'objectives.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -17,7 +20,8 @@ class _MainPageState extends State<MainPage> {
   String textSeconds = "00", textMinutes = "00", textHours = "00";
   Timer? timer;
   bool started = false;
-  double E_total = 0;
+  double _localTotal = 0;
+  double _userTotal = 0;
   //Textfield validation
   bool _validate = false;
   bool _editable = true;
@@ -34,7 +38,7 @@ class _MainPageState extends State<MainPage> {
   //Starting function
   void start() {
     started = true;
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       int localSeconds = seconds + 1;
       int localMinutes = minutes;
       int localHours = hours;
@@ -58,14 +62,15 @@ class _MainPageState extends State<MainPage> {
         minutes = localMinutes;
         hours = localHours;
         // computing gains
-        E_total = E_total + (double.parse(dollarsPerHour.text) / 3600);
+        _localTotal = _localTotal + (double.parse(dollarsPerHour.text) / 3600);
+        _userTotal = _userTotal + (double.parse(dollarsPerHour.text) / 3600);
         textSeconds = (seconds >= 10) ? "$seconds" : "0$seconds";
         textMinutes = (minutes >= 10) ? "$minutes" : "0$minutes";
         textHours = (hours >= 10) ? "$hours" : "0$hours";
       });
 
       //testing
-      debugPrint('$E_total');
+      debugPrint('$_localTotal');
     });
   }
 
@@ -85,7 +90,7 @@ class _MainPageState extends State<MainPage> {
       _editable = true;
     });
 
-    E_total = 0;
+    _localTotal = 0;
   }
 
   @override
@@ -137,24 +142,61 @@ class _MainPageState extends State<MainPage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  debugPrint('Sorry for you');
-
                   reset();
                 },
-                child: const Text('FIRED'))
+                child: const Text('STOP'))
           ],
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 100),
-          height: 50,
-          child: TextField(
-            enabled: false,
-            decoration: InputDecoration(
-                hintText: "total gains: " + E_total.toStringAsFixed(2) + " \$",
-                hintStyle: const TextStyle(color: Colors.black87)),
-          ),
-        ),
+        Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 100),
+              height: 50,
+              child: TextField(
+                enabled: false,
+                decoration: InputDecoration(
+                    hintText:
+                        "Daily gain: ${_localTotal.toStringAsFixed(2)} \$",
+                    hintStyle: const TextStyle(color: Colors.black87)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 100),
+              height: 25,
+              child: Text(
+                "TOTAL : ${_userTotal.toStringAsFixed(2)} \$ ",
+              ),
+            ),
+          ],
+        )
       ]),
+      bottomNavigationBar: NavigationBar(
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home), label: 'Counter'),
+          NavigationDestination(
+              icon: Icon(Icons.analytics_outlined), label: 'Objectives'),
+        ],
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPage = index;
+            if (index == 1) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Objectives(
+                    userTotal: _userTotal,
+                  ),
+                ),
+              );
+            }
+          });
+        },
+        selectedIndex: currentPage,
+      ),
     );
   }
 }
