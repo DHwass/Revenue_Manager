@@ -152,23 +152,20 @@ class _MainPageState extends State<MainPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 100),
               height: 50,
-              child: TextField(
-                enabled: false,
-                decoration: InputDecoration(
-                    hintText:
-                        "Daily gain: ${_localTotal.toStringAsFixed(2)} \$",
-                    hintStyle: const TextStyle(color: Colors.black87)),
-                textAlign: TextAlign.center,
+              child: Text(
+                "Daily gain: ${_localTotal.toStringAsFixed(2)} \$",
+                style: TextStyle(fontSize: 18),
               ),
             ),
             const SizedBox(
-              height: 50,
+              height: 30,
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 100),
               height: 25,
               child: Text(
-                "TOTAL : ${_userTotal.toStringAsFixed(2)} \$ ",
+                "Savings : ${_userTotal.toStringAsFixed(2)} \$ ",
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -195,7 +192,6 @@ class _MainPageState extends State<MainPage> {
             }
           });
         },
-        selectedIndex: currentPage,
       ),
     );
   }

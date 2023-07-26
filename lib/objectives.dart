@@ -13,6 +13,7 @@ class _ObjectivesState extends State<Objectives> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   List<Map<String, dynamic>> _items = [];
+  final _formKey = GlobalKey<FormState>();
 
   // ******************************************* Necessary functions **************************************************
 
@@ -70,10 +71,16 @@ class _ObjectivesState extends State<Objectives> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(
-                    width: 90,
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    width: 120,
+                    height: 10,
                     child: LinearProgressIndicator(
                       value: (widget.userTotal / _items[index]['price']),
+                      backgroundColor: Colors.grey,
                     ),
                   ),
                   IconButton(
@@ -115,35 +122,55 @@ class _ObjectivesState extends State<Objectives> {
         builder: (context) {
           return AlertDialog(
             title: const Text('New Objective'),
-            content: Column(
-              children: [
-                TextField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(hintText: "Item name"),
-                  autofocus: false,
-                ),
-                TextField(
-                  controller: _priceController,
-                  decoration: const InputDecoration(hintText: "Item price"),
-                  autofocus: false,
-                )
-              ],
+            content: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(hintText: "Item name"),
+                    autofocus: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the item name';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _priceController,
+                    decoration: const InputDecoration(hintText: "Item price"),
+                    autofocus: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the item price';
+                      }
+
+                      if (!RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
+                        return 'Please enter a valid number';
+                      }
+                      return null;
+                    },
+                  )
+                ],
+              ),
             ),
             actions: [
               MaterialButton(
                 color: Colors.green,
                 textColor: Colors.white,
                 onPressed: () async {
-                  if (id == null) {
-                    await _addItem();
-                  }
-                  if (id != null) {
-                    await _updateItem(id);
-                  }
-                  Navigator.of(context).pop();
+                  if (_formKey.currentState!.validate()) {
+                    if (id == null) {
+                      await _addItem();
+                    } else {
+                      await _updateItem(id);
+                    }
+                    Navigator.of(context).pop();
 
-                  _nameController.text = '';
-                  _priceController.text = '';
+                    _nameController.text = '';
+                    _priceController.text = '';
+                  }
                 },
                 child: Text((id == null) ? 'Add' : 'Update'),
               )
