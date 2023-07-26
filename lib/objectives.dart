@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:money_app/SQL_helper.dart';
 
 class Objectives extends StatefulWidget {
@@ -141,14 +142,13 @@ class _ObjectivesState extends State<Objectives> {
                     controller: _priceController,
                     decoration: const InputDecoration(hintText: "Item price"),
                     autofocus: false,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the item price';
                       }
 
-                      if (!RegExp(r'^\d*\.?\d*$').hasMatch(value)) {
-                        return 'Please enter a valid number';
-                      }
                       return null;
                     },
                   )
